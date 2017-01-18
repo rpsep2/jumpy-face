@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="co.uk.jobooz.jumpyface" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>Jumpy Face</name>
+    <description>
+        Jumpy Face - jump around!
+    </description>
+    <author email="support@jumpyface.com" href="http://www.jumpyface.com">
+        Ryan Pasley
+    </author>
+    <preference name="phonegap-version" value="cli-6.3.0" />
+    <preference name="orientation" value="portrait" />
+    <preference name="target-device" value="universal" />
+    <preference name="fullscreen" value="true" />
+    <preference name="prerendered-icon" value="true" />
+    <preference name="detect-data-types" value="false" />
+    <preference name="exit-on-suspend" value="false" />
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="SplashScreenDelay" value="10000" />
+    <preference name="disable-cursor" value="true" />
+    <preference name="android-minSdkVersion" value="19" />
+    <preference name="android-installLocation" value="auto" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="webviewbounce" value="false" />
+    <preference name="permissions" value="none" />
+    <preference name="SuppressesLongPressGesture" value="true" />
+    <preference name="Suppresses3DTouchGesture" value="true" />
+    <allow-navigation href="*" />
+    <allow-intent href="*" />
+    <icon src="www/icon.png" />
+    <gap:splash src="www/splash.png" />
+    <access origin="*" />
+</widget>
