@@ -1,0 +1,15 @@
+{
+	"levels": {
+		"1": {
+			"name": "Level 1",
+			"reward": "500",
+			"structure": {
+				"branches": [
+					{"left": "30%", "right": "30%"},
+					{"left": "40%", "right": "30%"},
+					{"left": "20%", "right": "50%"}
+				]
+			}
+		}
+	}
+}

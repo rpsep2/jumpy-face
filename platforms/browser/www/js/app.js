@@ -7,15 +7,31 @@ var is_device = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf
 if(is_device)
     document.addEventListener('deviceReady', onDeviceReady);
 else
-    $(document).ready(init);
+    $(document).ready(onDeviceReady);
+
+var config;
 
 function onDeviceReady(){
-    init();
+    // load the config first
+    load_config().done(function(data) {
+        config = data;
+        init();
+    });
+    
+}
 
-    setTimeout(function() {
-        StatusBar.hide();
-        navigator.splashscreen.hide();
-    }, 4000);
+function load_config() {
+    var d = $.Deferred();
+
+    $.ajax({
+        'url': "/js/config.json",
+        'dataType': "json",
+        success: function(data) {
+            d.resolve(data);
+        }
+    });
+
+    return d.promise();
 }
 
 function init(){
@@ -46,9 +62,14 @@ function init(){
     var min_left = -(half_window_width - half_monkey_width);
     var max_left = half_window_width - half_monkey_width;
     var remove_rotate;
+    var $level = $('#level');
 
     // jump listener
     $body.on(start_event, jump);
+
+    build_level(1);
+
+    start_level();
 
     function jump(event) {
         // collision loop
@@ -58,6 +79,7 @@ function init(){
         // clear the fall
         clearTimeout(jump_descent);
         clearTimeout(remove_rotate);
+        $monkey.removeClass('rotate-left rotate-right');
 
         // check coordinate of tap. was it left side or right side? jump that direction accordingly
         var x_pos = event.originalEvent.touches[0].pageX;
@@ -67,6 +89,9 @@ function init(){
         var cur_left = parseInt(matrix[4]);
         var new_top = cur_top - jump_y;
         monkey_new_top = new_top;
+        var dir = 'left';
+        var new_left_on_up;
+        var new_left_on_down;
 
         // down multipler
         var x_down_multiplier = (((monkey_default_y - new_top) / jump_y) * jump_x_half) * 0.85;
@@ -74,27 +99,31 @@ function init(){
         // as in: monkey moves jump_x_half pixels along x axis for every jump_y pixels on the y axis.
         // multiple by 0.85 as wont fall exactly the same as it jumps
 
-
         // jump left
         if (x_pos <= half_window_width) {
-            var new_left_on_up = Math.round(cur_left - jump_x_half);
-            var new_left_on_down = Math.round(new_left_on_up - x_down_multiplier);
             if (cur_left <= min_left) {
                 new_left_on_up = min_left;
-                new_left_on_down = min_left
+                new_left_on_down = min_left;
+            }
+            else {
+                new_left_on_up = Math.round(cur_left - jump_x_half);
+                new_left_on_down = Math.round(new_left_on_up - x_down_multiplier);
             }
         }
         // jump right
         else {
-            var new_left_on_up = Math.round(cur_left + jump_x_half);
-            var new_left_on_down = Math.round(new_left_on_up + x_down_multiplier);
             if (cur_left >= max_left) {
                 new_left_on_up = max_left;
                 new_left_on_down = max_left
             }
+            else {
+                new_left_on_up = Math.round(cur_left + jump_x_half);
+                new_left_on_down = Math.round(new_left_on_up + x_down_multiplier);
+            }
+            dir = 'right';
         }
 
-        $monkey.removeClass('rotate').addClass('rotate').css({
+        $monkey.attr('class', 'rotate-' + dir).css({
             '-webkit-transform': 'translate3d(' + new_left_on_up + 'px,' + new_top + 'px,0)',
             '-webkit-transition': 'all 0.15s ease-out'
         });
@@ -111,7 +140,7 @@ function init(){
         }, 150);
 
         remove_rotate = setTimeout(function() {
-            $monkey.removeClass('rotate');
+            $monkey.removeClass('rotate-left rotate-right');
         }, 400);
     }
 
@@ -136,7 +165,7 @@ function init(){
                 var to_bottom_ani_time = ((distance_from_top - monkey_height) / jump_y) * 0.3;
                 clearTimeout(jump_descent);
                 $monkey.css({
-                        '-webkit-transform': 'translate3d(-' + min_left + 'px,' + monkey_default_y + 'px,0)',
+                        '-webkit-transform': 'translate3d(' + min_left + 'px,' + monkey_default_y + 'px,0)',
                         '-webkit-transition': 'all ' + to_bottom_ani_time +'s linear'
                     });
             }
@@ -145,7 +174,7 @@ function init(){
                 // set to max left and the original destined top
                 // set animation time to however much time is left until we start falling
                 $monkey.css({
-                        '-webkit-transform': 'translate3d(-' + min_left + 'px,' + monkey_new_top + 'px,0)',
+                        '-webkit-transform': 'translate3d(' + min_left + 'px,' + monkey_new_top + 'px,0)',
                         '-webkit-transition': 'all ' + (time_until_descent / 1000) +'s linear'
                     });
             }
@@ -173,5 +202,15 @@ function init(){
                     });
             }
         }
+    }
+
+    function build_level(level) {
+        var level_data = config.levels[level];
+
+        console.log(level_data)
+    }
+
+    function start_level(){
+        $level.addClass('scroll');
     }
 }

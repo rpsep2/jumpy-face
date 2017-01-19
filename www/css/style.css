@@ -37,6 +37,7 @@ html{
 
 #monkey{
 	position: absolute;
+	z-index:10;
 	width:50px;
 	height:50px;
 	bottom:200px;
@@ -44,41 +45,78 @@ html{
 	margin-left: -25px;
 	-webkit-transform:translate3d(0,0,0);
 	-webkit-backface-visibility:hidden;
+}
+
+#monkey:after{
+	content: "";
+	position: absolute;
+	top:0px;
+	left:0px;
+	width:50px;
+	height:50px;
 	background-image:url(../images/monkey.gif);
 	background-size: 50px 50px;
 	background-position: center;
 }
 
-#monkey.rotate:after,
-#monkey.rotate:before{
-	content: "";
-	width: 50px;
-	height: 50px;
-	position: absolute;
-	z-index:5;
-	top:0px;
-	left:0px;
-	border:4px solid rgba(255,255,255,0.8);
-	border-top-color: transparent;
-	border-radius: 50px;
-	-webkit-animation:rotate 0.4s infinite linear;
+#monkey.rotate-left:after{
+	-webkit-animation:rotate_left 0.4s linear;
+	-webkit-animation-iteration-count:1;
 }
 
-#monkey.rotate:before{
-	top:6px;
-	left:6px;
-	width:30px;
-	height:30px;
-	border:4px solid rgba(0,93,164,0.8);
-	border-left-color: transparent;
+#monkey.rotate-right:after{
+	-webkit-animation:rotate_right 0.4s linear;
+	-webkit-animation-iteration-count:1;
 }
 
+@-webkit-keyframes rotate_left{
+	0%{
+		-webkit-transform:rotate(0deg);
+	}
+	100%{
+		-webkit-transform:rotate(-360deg);
+	}
+}
 
-@-webkit-keyframes rotate{
+@-webkit-keyframes rotate_right{
 	0%{
 		-webkit-transform:rotate(0deg);
 	}
 	100%{
 		-webkit-transform:rotate(360deg);
 	}
+}
+
+#gameplay-screen{
+	position: absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	z-index:2;
+	overflow: hidden;
+}
+
+#level{
+	position: absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	z-index:2;
+	overflow: hidden;
+}
+
+.branch{
+	position: absolute;
+	z-index: 1;
+	height:25px;
+	background:brown;
+}
+
+.branch.left{
+	left:0px;
+}
+
+.branch.right{
+	right:0px;
 }
