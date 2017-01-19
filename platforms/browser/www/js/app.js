@@ -63,6 +63,7 @@ function init(){
     var max_left = half_window_width - half_monkey_width;
     var remove_rotate;
     var $level = $('#level');
+    var branch_row_distance = window_height * 0.8;
 
     // jump listener
     $body.on(start_event, jump);
@@ -207,10 +208,42 @@ function init(){
     function build_level(level) {
         var level_data = config.levels[level];
 
-        console.log(level_data)
+        var branches = [];
+
+        $.each(level_data.structure.branches, function(i, branch_set) {
+            branches.push(create_branch_row(branch_set, i));
+        });
+
+        var bananas = [];
+
+        $.each(level_data.structure.bananas, function(i, banana) {
+            bananas.push(create_banana(banana));
+        });
+
+        // 3s per branch
+        $level.append(branches, bananas).css({
+            '-webkit-transition': 'all ' + (branches.length + 1) * 3 + 's linear',
+            height: (branches.length + 1) * branch_row_distance + 'px'
+        });
+    }
+
+    function create_branch_row(data, i) {
+        var $row = $(document.createElement('div')).addClass('branch-row').css('bottom', (i + 1) * branch_row_distance);
+        var $bl = $(document.createElement('div')).addClass('branch left').css('width', data.left);
+        var $br = $(document.createElement('div')).addClass('branch right').css('width', data.right);
+        $row.append($bl, $br);
+        return $row;
+    }
+
+    function create_banana(data) {
+        var $b = $(document.createElement('span')).addClass('banana').css({
+            bottom: (data.position * branch_row_distance) - (branch_row_distance / 2),
+            left: data.left
+        });
+        return $b;
     }
 
     function start_level(){
-        $level.addClass('scroll');
+        $level.css('-webkit-transform', 'translate3d(0,100%,0)');
     }
 }
