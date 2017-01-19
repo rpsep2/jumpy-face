@@ -3,16 +3,16 @@
 <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "co.uk.jobooz.jumpyface"
+        id        = "co.uk.jobooz.monkeyjump"
         version   = "1.0.0">
 
-    <name>Jumpy Face</name>
+    <name>Monkey Jump</name>
 
     <description>
-        Jumpy Face - jump around!
+        Monkey Jump - Jump Around!
     </description>
 
-    <author href="http://www.jumpyface.com" email="support@jumpyface.com">
+    <author href="http://www.monkeyjump.com" email="support@monkeyjump.com">
         Ryan Pasley
     </author>
 

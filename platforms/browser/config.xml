@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="co.uk.jobooz.jumpyface" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>Jumpy Face</name>
+<widget id="co.uk.jobooz.monkeyjump" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>Monkey Jump</name>
     <description>
-        Jumpy Face - jump around!
+        Monkey Jump - Jump Around!
     </description>
-    <author email="support@jumpyface.com" href="http://www.jumpyface.com">
+    <author email="support@monkeyjump.com" href="http://www.monkeyjump.com">
         Ryan Pasley
     </author>
     <preference name="phonegap-version" value="cli-6.3.0" />
