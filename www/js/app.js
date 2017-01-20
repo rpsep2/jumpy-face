@@ -17,7 +17,7 @@ function onDeviceReady(){
         config = data;
         init();
     });
-    
+
 }
 
 function load_config() {
@@ -162,8 +162,8 @@ function init(){
             // on the way down
             if ($monkey.hasClass('down')) {
                 // work out animation time for down. 0.3s for every jump_y
-                var distance_from_top = window_height - offset.top;
-                var to_bottom_ani_time = ((distance_from_top - monkey_height) / jump_y) * 0.3;
+                var distance_from_bottom = window_height - offset.top;
+                var to_bottom_ani_time = ((distance_from_bottom - monkey_height) / jump_y) * 0.3;
                 clearTimeout(jump_descent);
                 $monkey.css({
                         '-webkit-transform': 'translate3d(' + min_left + 'px,' + monkey_default_y + 'px,0)',
@@ -185,8 +185,8 @@ function init(){
             // on the way down
             if ($monkey.hasClass('down')) {
                 // work out animation time for down. 0.3s for every jump_y
-                var distance_from_top = window_height - offset.top;
-                var to_bottom_ani_time = ((distance_from_top - monkey_height) / jump_y) * 0.3;
+                var distance_from_bottom = window_height - offset.top;
+                var to_bottom_ani_time = ((distance_from_bottom - monkey_height) / jump_y) * 0.3;
                 clearTimeout(jump_descent);
                 $monkey.css({
                         '-webkit-transform': 'translate3d(' + max_left + 'px,' + monkey_default_y + 'px,0)',
