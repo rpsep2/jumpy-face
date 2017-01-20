@@ -17,7 +17,7 @@ function onDeviceReady(){
         config = data;
         init();
     });
-    
+
 }
 
 function load_config() {
@@ -64,19 +64,20 @@ function init(){
     var remove_rotate;
     var $level = $('#level');
     var branch_row_distance = window_height * 0.8;
+    var animation_time_per_branch = 3; // seconds
+    var level_data;
+    var time_since_level_start = 0;
+    var total_level_height;
+    var pixels_per_ms;
 
     // jump listener
     $body.on(start_event, jump);
 
+    // build and start level
     build_level(1);
-
     start_level();
 
     function jump(event) {
-        // collision loop
-        if (!collision_checker)
-            collision_checker = setInterval(check_collision, 20);
-
         // clear the fall
         clearTimeout(jump_descent);
         clearTimeout(remove_rotate);
@@ -150,9 +151,62 @@ function init(){
         if (time_until_descent > 0)
             time_until_descent = ((time_until_descent - 20) < 0) ? 0 : time_until_descent - 20;
 
+        time_since_level_start += 20;
 
-        // have we hit a branch ??
+        // have we hit a branch ?? what branches are currently on the view
         // TODO: the check
+        var branch_no = Math.floor(time_since_level_start / (animation_time_per_branch * 1000)) - 1;
+        // 2 branches can be on the page at any time
+        if (branch_no < 0)
+            var branch_nos = [0];
+        else
+            var branch_nos = [branch_no, branch_no + 1];
+
+        // what is the current position of these branches?
+        // work out number of px level has scrolled:
+        // 100% = $level.height() : (branches.length + 1) * branch_row_distance
+        // pixels per ms = above result, divided by (level_data.total_ani_time / 1000)
+        // work outabove at level_start, then here:
+        // pixels moved = time_since_level_start * pixels per ms
+        // then, position top now = branch start_top + pixels moved.
+        // so now we know the top pos, and we have level data for the width, and we know the height is 25
+        // so is the monkey in any of these?
+
+        // do this in level start
+        //total_level_height created on level creation
+        //pixels_per_ms created on level creation
+
+        var pixels_moved = Math.round(time_since_level_start * pixels_per_ms);
+        $.each(branch_nos, function(i, branch) {
+            // say bottom start was 1000px. weve moved 500 px. bottom pos now is 500
+
+            var branch_bottom_pos_now = level_data.branch_start_pos[branch] - pixels_moved;
+            var branch_top_pos_now = branch_bottom_pos_now + 25;
+
+            var branch_top_offset_now = window_height - branch_top_pos_now;
+            var branch_bottom_offset_now = branch_top_offset_now + 25;
+
+
+            // is the monkey within the branch row?
+            if (offset.top <= branch_bottom_offset_now && offset.top >= branch_top_offset_now) {
+                // uh oh - is it in the gap?
+                console.log('in!!!');
+
+                // TODO: fix below
+                var offset_left_percent = (100 / window_width) * offset.left;
+                var offset_right_percent = (100 / window_width) * (offset.left + monkey_width);
+                if (offset_left_percent < level_data.structure.branches[branch].left || offset_right_percent > (100 - level_data.structure.branches[branch].right))
+                    // is in the gap! all okay
+                    console.log('ok')
+                else
+                    console.log('hit!!!!')
+                // return false, stop, gameover etc
+            }
+        });
+
+
+
+
         // TODO: has_hit_branch(); (show animation, sound seffectcs etc)
         // TODO: then show_gameover();
 
@@ -162,8 +216,8 @@ function init(){
             // on the way down
             if ($monkey.hasClass('down')) {
                 // work out animation time for down. 0.3s for every jump_y
-                var distance_from_top = window_height - offset.top;
-                var to_bottom_ani_time = ((distance_from_top - monkey_height) / jump_y) * 0.3;
+                var distance_from_bottom = window_height - offset.top;
+                var to_bottom_ani_time = ((distance_from_bottom - monkey_height) / jump_y) * 0.3;
                 clearTimeout(jump_descent);
                 $monkey.css({
                         '-webkit-transform': 'translate3d(' + min_left + 'px,' + monkey_default_y + 'px,0)',
@@ -185,8 +239,8 @@ function init(){
             // on the way down
             if ($monkey.hasClass('down')) {
                 // work out animation time for down. 0.3s for every jump_y
-                var distance_from_top = window_height - offset.top;
-                var to_bottom_ani_time = ((distance_from_top - monkey_height) / jump_y) * 0.3;
+                var distance_from_bottom = window_height - offset.top;
+                var to_bottom_ani_time = ((distance_from_bottom - monkey_height) / jump_y) * 0.3;
                 clearTimeout(jump_descent);
                 $monkey.css({
                         '-webkit-transform': 'translate3d(' + max_left + 'px,' + monkey_default_y + 'px,0)',
@@ -206,10 +260,10 @@ function init(){
     }
 
     function build_level(level) {
-        var level_data = config.levels[level];
+        level_data = config.levels[level];
 
         var branches = [];
-
+        level_data['branch_start_pos'] = [];
         $.each(level_data.structure.branches, function(i, branch_set) {
             branches.push(create_branch_row(branch_set, i));
         });
@@ -221,16 +275,20 @@ function init(){
         });
 
         // 3s per branch
+        level_data['total_animation_time'] = (branches.length + 1) * animation_time_per_branch;
+        total_level_height = (branches.length + 1) * branch_row_distance;
+        pixels_per_ms = total_level_height / (level_data.total_animation_time * 1000);
         $level.append(branches, bananas).css({
-            '-webkit-transition': 'all ' + (branches.length + 1) * 3 + 's linear',
-            height: (branches.length + 1) * branch_row_distance + 'px'
+            '-webkit-transition': 'all ' + level_data.total_animation_time + 's linear',
+            height: total_level_height + 'px'
         });
     }
 
     function create_branch_row(data, i) {
+        level_data['branch_start_pos'].push((i + 1) * branch_row_distance);
         var $row = $(document.createElement('div')).addClass('branch-row').css('bottom', (i + 1) * branch_row_distance);
-        var $bl = $(document.createElement('div')).addClass('branch left').css('width', data.left);
-        var $br = $(document.createElement('div')).addClass('branch right').css('width', data.right);
+        var $bl = $(document.createElement('div')).addClass('branch left').css('width', data.left + '%');
+        var $br = $(document.createElement('div')).addClass('branch right').css('width', data.right + '%');
         $row.append($bl, $br);
         return $row;
     }
@@ -244,6 +302,10 @@ function init(){
     }
 
     function start_level(){
+        time_since_level_start = 0;
+
         $level.css('-webkit-transform', 'translate3d(0,100%,0)');
+        // collision loop
+        collision_checker = setInterval(check_collision, 20);
     }
 }

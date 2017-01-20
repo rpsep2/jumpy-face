@@ -5,19 +5,19 @@
 			"reward": "500",
 			"structure": {
 				"branches": [
-					{"left": "30%", "right": "20%"},
-					{"left": "20%", "right": "30%"},
-					{"left": "20%", "right": "40%"},
-					{"left": "20%", "right": "40%"},
-					{"left": "30%", "right": "20%"},
-					{"left": "22%", "right": "22%"},
-					{"left": "20%", "right": "31%"},
-					{"left": "40%", "right": "20%"},
-					{"left": "20%", "right": "40%"},
-					{"left": "60%", "right": "2%"},
-					{"left": "50%", "right": "10%"},
-					{"left": "4%", "right": "38%"},
-					{"left": "19%", "right": "46%"}
+					{"left": "30", "right": "20"},
+					{"left": "20", "right": "30"},
+					{"left": "20", "right": "40"},
+					{"left": "20", "right": "40"},
+					{"left": "30", "right": "20"},
+					{"left": "22", "right": "22"},
+					{"left": "20", "right": "31"},
+					{"left": "40", "right": "20"},
+					{"left": "20", "right": "40"},
+					{"left": "60", "right": "2"},
+					{"left": "50", "right": "10"},
+					{"left": "4", "right": "38"},
+					{"left": "19", "right": "46"}
 				],
 				"bananas": [
 					{"position": "3", "left": "20%"},
