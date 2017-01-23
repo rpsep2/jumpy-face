@@ -127,19 +127,19 @@ function init(){
 
         $monkey.attr('class', 'rotate-' + dir).css({
             '-webkit-transform': 'translate3d(' + new_left_on_up + 'px,' + new_top + 'px,0)',
-            '-webkit-transition': 'all 0.15s ease-out'
+            '-webkit-transition': 'all 0.2s ease-out'
         });
 
         // work out animation time for down. 0.3s for every jump_y
         var to_bottom_ani_time = ((monkey_default_y - new_top) / jump_y) * 0.3;
-        time_until_descent = 150;
+        time_until_descent = 200;
         jump_descent = setTimeout(function() {
             $monkey.addClass('down')
                 .css({
                     '-webkit-transform': 'translate3d(' + new_left_on_down + 'px,' + monkey_default_y + 'px,0)',
                     '-webkit-transition': 'all ' + to_bottom_ani_time +'s ease-in'
                 });
-        }, 150);
+        }, 200);
 
         remove_rotate = setTimeout(function() {
             $monkey.removeClass('rotate-left rotate-right');
@@ -177,6 +177,7 @@ function init(){
         //pixels_per_ms created on level creation
 
         var pixels_moved = Math.round(time_since_level_start * pixels_per_ms);
+        var hit = false;
         $.each(branch_nos, function(i, branch) {
             // say bottom start was 1000px. weve moved 500 px. bottom pos now is 500
 
@@ -190,25 +191,22 @@ function init(){
             // is the monkey within the branch row?
             if (offset.top <= branch_bottom_offset_now && offset.top >= branch_top_offset_now) {
                 // uh oh - is it in the gap?
-                console.log('in!!!');
 
                 // TODO: fix below
-                var offset_left_percent = (100 / window_width) * offset.left;
-                var offset_right_percent = (100 / window_width) * (offset.left + monkey_width);
-                if (offset_left_percent < level_data.structure.branches[branch].left || offset_right_percent > (100 - level_data.structure.branches[branch].right))
-                    // is in the gap! all okay
-                    console.log('ok')
-                else
-                    console.log('hit!!!!')
-                // return false, stop, gameover etc
+                var offset_left_percent = Math.round((100 / window_width) * offset.left);
+                var offset_right_percent = Math.round((100 / window_width) * (offset.left + monkey_width));
+                if (offset_left_percent <= level_data.structure.branches[branch].left || offset_right_percent >= (100 - level_data.structure.branches[branch].right)) {
+                    hit = true;
+                    return false;
+                }
+
             }
         });
 
-
-
-
-        // TODO: has_hit_branch(); (show animation, sound seffectcs etc)
-        // TODO: then show_gameover();
+        if (hit) {
+            show_has_hit_branch();
+            return false;
+        }
 
         // then check if we have hit the sides - dont allow to go off the sides
         // LEFT side hit
@@ -307,5 +305,39 @@ function init(){
         $level.css('-webkit-transform', 'translate3d(0,100%,0)');
         // collision loop
         collision_checker = setInterval(check_collision, 20);
+    }
+
+    function show_has_hit_branch() {
+        // clear intervals, timeouts etc
+        clearInterval(collision_checker);
+        clearTimeout(jump_descent);
+        clearTimeout(remove_rotate);
+
+        // stop the level
+        var l_matrix = $level.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
+        var l_cur_top = parseInt(l_matrix[5]);
+        $level.css('-webkit-transform', 'translate3d(0,' + l_cur_top + 'px,0)');
+
+        // stop the monkey
+        var m_matrix = $monkey.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
+        var m_cur_top = parseInt(m_matrix[5]);
+        var m_cur_left = parseInt(m_matrix[4]);
+        $monkey.css('-webkit-transform', 'translate3d(' + m_cur_left + 'px,' + m_cur_top + 'px,0)');
+
+        // animate monkey dieing (zoom, dead monkey bg, up then to the bottom)
+        // TODO:
+
+        // play sound effects (SMACK, monkey sound, gameover game sound effect)
+        // TODO:
+
+        // after x time animating/ playing sounds, show_gameover
+        setTimeout(function() {
+            show_gameover();
+        }, 3000);
+    }
+
+    function show_gameover() {
+        // show end score, gameover text etc
+        // TODO:
     }
 }

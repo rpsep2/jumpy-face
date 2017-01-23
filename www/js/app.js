@@ -127,19 +127,19 @@ function init(){
 
         $monkey.attr('class', 'rotate-' + dir).css({
             '-webkit-transform': 'translate3d(' + new_left_on_up + 'px,' + new_top + 'px,0)',
-            '-webkit-transition': 'all 0.15s ease-out'
+            '-webkit-transition': 'all 0.2s ease-out'
         });
 
         // work out animation time for down. 0.3s for every jump_y
         var to_bottom_ani_time = ((monkey_default_y - new_top) / jump_y) * 0.3;
-        time_until_descent = 150;
+        time_until_descent = 200;
         jump_descent = setTimeout(function() {
             $monkey.addClass('down')
                 .css({
                     '-webkit-transform': 'translate3d(' + new_left_on_down + 'px,' + monkey_default_y + 'px,0)',
                     '-webkit-transition': 'all ' + to_bottom_ani_time +'s ease-in'
                 });
-        }, 150);
+        }, 200);
 
         remove_rotate = setTimeout(function() {
             $monkey.removeClass('rotate-left rotate-right');
@@ -193,12 +193,9 @@ function init(){
                 // uh oh - is it in the gap?
 
                 // TODO: fix below
-                var offset_left_percent = (100 / window_width) * offset.left;
-                var offset_right_percent = (100 / window_width) * (offset.left + monkey_width);
-                if (offset_left_percent <= level_data.structure.branches[branch].left || offset_right_percent >= (100 - level_data.structure.branches[branch].right))
-                    // is in the gap! all okay
-                    console.log('ok');
-                else {
+                var offset_left_percent = Math.round((100 / window_width) * offset.left);
+                var offset_right_percent = Math.round((100 / window_width) * (offset.left + monkey_width));
+                if (offset_left_percent <= level_data.structure.branches[branch].left || offset_right_percent >= (100 - level_data.structure.branches[branch].right)) {
                     hit = true;
                     return false;
                 }
@@ -207,7 +204,6 @@ function init(){
         });
 
         if (hit) {
-            console.log('hit!!!!');
             show_has_hit_branch();
             return false;
         }
@@ -313,20 +309,20 @@ function init(){
 
     function show_has_hit_branch() {
         // clear intervals, timeouts etc
-        clearinterval(collision_checker);
+        clearInterval(collision_checker);
         clearTimeout(jump_descent);
         clearTimeout(remove_rotate);
 
         // stop the level
         var l_matrix = $level.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
-        var l_cur_top = parseInt(matrix[5]);
-        $level.css('-webkit-transform', 'translate3d(0,' + l_cur_top + ',0)');
+        var l_cur_top = parseInt(l_matrix[5]);
+        $level.css('-webkit-transform', 'translate3d(0,' + l_cur_top + 'px,0)');
 
         // stop the monkey
         var m_matrix = $monkey.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
-        var m_cur_top = parseInt(matrix[5]);
-        var m_cur_left = parseInt(matrix[4]);
-        $monkey.css('-webkit-transform', 'translate3d(' + m_cur_left + ',' + m_cur_top + ',0)');
+        var m_cur_top = parseInt(m_matrix[5]);
+        var m_cur_left = parseInt(m_matrix[4]);
+        $monkey.css('-webkit-transform', 'translate3d(' + m_cur_left + 'px,' + m_cur_top + 'px,0)');
 
         // animate monkey dieing (zoom, dead monkey bg, up then to the bottom)
         // TODO:
