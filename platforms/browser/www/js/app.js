@@ -149,13 +149,13 @@ function init(){
     function check_collision() {
         var offset = $monkey.offset();
         if (time_until_descent > 0)
-            time_until_descent = ((time_until_descent - 20) < 0) ? 0 : time_until_descent - 20;
+            time_until_descent = ((time_until_descent - 20) <= 0) ? 0 : time_until_descent - 20;
 
         time_since_level_start += 20;
 
         // have we hit a branch ?? what branches are currently on the view
         // TODO: the check
-        var branch_no = Math.floor(time_since_level_start / (animation_time_per_branch * 1000)) - 1;
+        var branch_no = Math.round(time_since_level_start / (animation_time_per_branch * 1000)) - 1;
         // 2 branches can be on the page at any time
         if (branch_no < 0)
             var branch_nos = [0];
@@ -176,7 +176,7 @@ function init(){
         //total_level_height created on level creation
         //pixels_per_ms created on level creation
 
-        var pixels_moved = Math.round(time_since_level_start * pixels_per_ms);
+        /*var pixels_moved = Math.round(time_since_level_start * pixels_per_ms);
         var hit = false;
         $.each(branch_nos, function(i, branch) {
             // say bottom start was 1000px. weve moved 500 px. bottom pos now is 500
@@ -196,10 +196,30 @@ function init(){
                 var offset_left_percent = Math.round((100 / window_width) * offset.left);
                 var offset_right_percent = Math.round((100 / window_width) * (offset.left + monkey_width));
                 if (offset_left_percent <= level_data.structure.branches[branch].left || offset_right_percent >= (100 - level_data.structure.branches[branch].right)) {
+
+
+                    console.log('hit')
                     hit = true;
                     return false;
                 }
 
+            }
+        });*/
+
+        var hit = false;
+        $.each(branch_nos, function(i, branch) {
+            var b_offset = $('.branch-row:eq(' + branch + ')').offset();
+            //console.log(offset.top)
+            //console.log(b_offset.top)
+            //console.log('---------')
+
+            if (offset.top <= b_offset.top && (offset.top + monkey_height) >= b_offset.top) {
+                var offset_left_percent = (100 / window_width) * offset.left;
+                var offset_right_percent = (100 / window_width) * (offset.left + monkey_width);
+                if (offset_left_percent <= level_data.structure.branches[branch].left || offset_right_percent >= (100 - level_data.structure.branches[branch].right)) {
+                    hit = true;
+                    return false;
+                }
             }
         });
 
@@ -255,6 +275,15 @@ function init(){
                     });
             }
         }
+
+        // then check if we have hit a banana!
+        $.each(branch_nos, function(i, b_no) {
+            if (level_data.structure.bananas[b_no]){
+                            console.log('nana!')
+            }
+        });
+
+
     }
 
     function build_level(level) {
@@ -269,7 +298,7 @@ function init(){
         var bananas = [];
 
         $.each(level_data.structure.bananas, function(i, banana) {
-            bananas.push(create_banana(banana));
+            bananas.push(create_banana(i, banana));
         });
 
         // 3s per branch
@@ -291,10 +320,10 @@ function init(){
         return $row;
     }
 
-    function create_banana(data) {
+    function create_banana(i, left) {
         var $b = $(document.createElement('span')).addClass('banana').css({
-            bottom: (data.position * branch_row_distance) - (branch_row_distance / 2),
-            left: data.left
+            bottom: (i * branch_row_distance) - (branch_row_distance / 2),
+            left: left + '%'
         });
         return $b;
     }
@@ -313,27 +342,34 @@ function init(){
         clearTimeout(jump_descent);
         clearTimeout(remove_rotate);
 
+        $body.off();
+
         // stop the level
         var l_matrix = $level.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
         var l_cur_top = parseInt(l_matrix[5]);
         $level.css('-webkit-transform', 'translate3d(0,' + l_cur_top + 'px,0)');
 
-        // stop the monkey
-        var m_matrix = $monkey.css('-webkit-transform').replace(/[^0-9\-.,]/g, '').split(',');
-        var m_cur_top = parseInt(m_matrix[5]);
-        var m_cur_left = parseInt(m_matrix[4]);
-        $monkey.css('-webkit-transform', 'translate3d(' + m_cur_left + 'px,' + m_cur_top + 'px,0)');
+        // stop and animate the monkey falling
+        $monkey.css({
+            '-webkit-transition': 'all 0.2s ease-out',
+            '-webkit-transform': 'scale(2) translate3d(0px,-100px,0)'
+        }).removeClass('rotate-left rotate-right');
 
-        // animate monkey dieing (zoom, dead monkey bg, up then to the bottom)
-        // TODO:
+        setTimeout(function() {
+            $monkey.css({
+                '-webkit-transition': 'all 0.4s ease-in',
+                '-webkit-transform': 'scale(1) translate3d(0px,300px,0)'
+            });
+        }, 200);
+
 
         // play sound effects (SMACK, monkey sound, gameover game sound effect)
         // TODO:
 
-        // after x time animating/ playing sounds, show_gameover
+        // after x time animating/ playing sounds, show_gameover screen
         setTimeout(function() {
             show_gameover();
-        }, 3000);
+        }, 2000);
     }
 
     function show_gameover() {
