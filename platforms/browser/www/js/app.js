@@ -279,10 +279,18 @@ function init(){
         // then check if we have hit a banana!
         $.each(branch_nos, function(i, b_no) {
             if (level_data.structure.bananas[b_no]){
-                            console.log('nana!')
+                /*var b_offset = $('.banana:eq('+ b_no +')').offset();
+                if (b_offset.top <= b_offset.top && (offset.top + monkey_height) >= b_offset.top) {
+                    var offset_left_percent = (100 / window_width) * offset.left;
+                    var offset_right_percent = (100 / window_width) * (offset.left + monkey_width);
+                    if (offset_left_percent <= level_data.structure.bananas[b_no] || offset_right_percent >= (100 - (level_data.structure.bananas[b_no] + 3))) {
+                        // collect banana
+                        console.log('GOT BANANA')
+                        return false;
+                    }
+                }*/
             }
         });
-
 
     }
 
@@ -298,7 +306,7 @@ function init(){
         var bananas = [];
 
         $.each(level_data.structure.bananas, function(i, banana) {
-            bananas.push(create_banana(i, banana));
+            bananas.push(create_banana(banana, i));
         });
 
         // 3s per branch
@@ -320,9 +328,9 @@ function init(){
         return $row;
     }
 
-    function create_banana(i, left) {
+    function create_banana(left, i) {
         var $b = $(document.createElement('span')).addClass('banana').css({
-            bottom: (i * branch_row_distance) - (branch_row_distance / 2),
+            bottom: ((parseInt(i) + 1) * branch_row_distance) - (branch_row_distance / 2),
             left: left + '%'
         });
         return $b;
